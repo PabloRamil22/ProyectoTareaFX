@@ -1,17 +1,25 @@
 package com.example.proyectotareasfx.models;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User extends ModeloBase{
     private int iduser;
     private String username;
-    private String password;
+
     private Rol rol;
+    private String Password;
 
     public User() {
+    }
+
+    public String getPassword() {
+        return Password;
+    }
+
+    public void setPassword(String password) {
+        Password = password;
     }
 
     public int getIduser() {
@@ -49,7 +57,7 @@ public class User extends ModeloBase{
         return "User{" +
                 "iduser=" + iduser +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
+                ", password='" + Password + '\'' +
                 ", rol=" + rol +
                 '}';
     }
@@ -81,5 +89,29 @@ public class User extends ModeloBase{
         }
 
 
+    }
+
+    public List<User> getAll() {
+        List<User> userList=new ArrayList<>();
+        User user= new User();
+        Connection conn= user.getConnection();
+        String consulta= "select iduser,username,user.idrol,description from user inner join rol on user.idrol=rol.idrol";
+        try {
+            Statement stm=conn.createStatement();
+            ResultSet resultSet=stm.executeQuery(consulta);
+            while(resultSet.next()){
+                User user1=new User();
+                user1.setIduser(resultSet.getInt("iduser"));
+                user1.setUsername(resultSet.getString("username"));
+                Rol rol1=new Rol();
+                rol1.setIdrol(resultSet.getInt("user.idrol"));
+                rol1.setDescription(resultSet.getString("description"));
+                user1.setRol(rol1);
+                userList.add(user1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return userList;
     }
 }

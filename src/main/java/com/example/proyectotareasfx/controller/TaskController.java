@@ -1,13 +1,18 @@
 package com.example.proyectotareasfx.controller;
 
-import models.Task;
-import models.User;
+
+
+import com.example.proyectotareasfx.models.Rol;
+import com.example.proyectotareasfx.models.Task;
+import com.example.proyectotareasfx.models.User;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public class TaskController {
     public User userLogged;
+    public List<User> getAllUser;
+
 
     public boolean login(String username,String password){
 
@@ -20,6 +25,8 @@ public class TaskController {
         }
 
     }
+
+
     public boolean createUser(String username,String pass,int rol){
         User user=new User();
         return user.insertar("(username,password,idrol) values (?,?,?)",username,pass,rol);
@@ -30,24 +37,40 @@ public class TaskController {
         return user.actualizar("password=? where username=?",password,username);
     }
 
-    public boolean createTask(String title, String description, LocalDate deadLine){
+    public boolean createTask(String title, String description, LocalDate deadline){
         Task task=new Task();
-        return task.insertar("(title, description, deadline, iduser) values (?,?,?,?)", title, description, deadLine, userLogged.getIduser());
+        task.insertar("(title,description,deadline,iduser) values (?,?,?,?)",title,description,deadline,userLogged.getIduser());
+        return true;
     }
 
     public List<Task> getAllTaskByUser(){
-        Task task= new Task();
+        Task task=new Task();
         return task.getAllByUser(userLogged.getIduser());
     }
-    public List<Task> getALlTask(){
+    public List<Task> getAllTask(){
         Task task=new Task();
         return task.getAllTask();
     }
-    public boolean tareaCompleta(int idtask){
+
+    public boolean completeTask(int idtask){
         Task task=new Task();
-        return task.actualizar("status=1 where idtask=?", idtask);
+        return task.actualizar("status=? where idtask=?",true, idtask);
     }
-    public boolean eliminarTarea(int idtask){
-       return new Task().borrar("idtask=?",idtask);
+
+    public boolean isAdmin() {
+        return userLogged.getRol().getIdrol()==2?true:false;
+    }
+    public List<User> getAllUser(){
+        User user=new User();
+        return user.getAll();
+    }
+
+    public List<Rol> getAllRol() {
+        Rol rol=new Rol();
+        return rol.getAll();
+    }
+
+    public void updateUser(User user) {
+        user.actualizar("password=?, idrol=? where iduser=?", user.getPassword(),user.getRol(), user.getIduser());
     }
 }
